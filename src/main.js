@@ -1,6 +1,7 @@
 import makeFilmCard from './make-film-card';
 import makeFilter from './make-filter';
-import Card from './card';
+import {getCard} from './mock';
+import {rand} from './utils';
 
 /** Контейнер для фильтров */
 const filterContainer = document.querySelector(`.main-navigation`);
@@ -27,38 +28,36 @@ const addFilter = (link, caption, amount = null, isAdditional = false) => {
 
 /**
  * Добавить карточки с фильмами
- * @param {string} cards карточки
+ * @param {Card[]} cards карточки
  */
 const addFilmCards = (cards) => {
-  cardsContainer.insertAdjacentHTML(`beforeend`, cards);
+  addCardsToContainer(cardsContainer, cards);
 };
 
 /**
  * Добавить карточки с фильмами в раздел "Топ рейтинга"
- * @param {string} cards карточки
+ * @param {Card[]} cards карточки
  */
 const addTopRatedCards = (cards) => {
-  cardsTopRatedContainer.insertAdjacentHTML(`beforeend`, cards);
+  addCardsToContainer(cardsTopRatedContainer, cards);
 };
 
 /**
  * Добавить карточки с фильмами в раздел "Наиболее комментируемые"
- * @param {string} cards карточки
+ * @param {Card[]} cards карточки
  */
 const addMostCommentedCards = (cards) => {
-  cardsMostCommentedContainer.insertAdjacentHTML(`beforeend`, cards);
+  addCardsToContainer(cardsMostCommentedContainer, cards);
 };
 
-const generateCard = () => new Card(
-    `The Assassination Of Jessie James By The Coward Robert Ford`,
-    `9.8`,
-    2018,
-    `1h&nbsp;13m`,
-    `Comedy`,
-    `three-friends.jpg`,
-    `A priest with a haunted past and a novice on the threshold of her final vows are sent by the Vatican to investigate the death of a young nun in Romania and confront a malevolent force in the form of a demonic nun.`,
-    13
-);
+/**
+ * Добавить карточки с фильмами в контейнер
+ * @param {Element} container контейнер
+ * @param {Card[]} cards      карточки
+ */
+const addCardsToContainer = (container, cards) => {
+  container.insertAdjacentHTML(`beforeend`, cards.reduce((acc, curr) => acc + makeFilmCard(curr), ``));
+};
 
 /**
  * Обработчик смены фильтра
@@ -69,18 +68,9 @@ const filterHandler = (evt) => {
     return;
   }
   cardsContainer.innerHTML = ``;
-  const card = makeFilmCard(generateCard());
-  const cards = Array(rand(1, 8)).fill(card).join(``);
-  addFilmCards(cards);
+  const count = rand(1, 8);
+  addFilmCards([...Array(count)].map(() => getCard()));
 };
-
-/**
- * Генератор случайного числа
- * @param {number} min минимальное значение
- * @param {number} max максимальное значение
- * @return {number} случайное число из интервала
- */
-const rand = (min, max) => Math.floor(min + Math.random() * (max + 1 - min));
 
 addFilter(`#all`, `All movies`);
 addFilter(`#watchlist`, `Watchlist`, 13);
@@ -90,10 +80,6 @@ addFilter(`#favorites`, `Favorites`, 8);
 
 filterContainer.addEventListener(`click`, filterHandler);
 
-let card = makeFilmCard(generateCard());
-let cards = Array(7).fill(card).join(``);
-addFilmCards(cards);
-card = makeFilmCard(generateCard(), true);
-cards = Array(2).fill(card).join(``);
-addTopRatedCards(cards);
-addMostCommentedCards(cards);
+addFilmCards([...Array(7)].map(() => getCard()));
+addTopRatedCards([...Array(2)].map(() => getCard()));
+addMostCommentedCards([...Array(2)].map(() => getCard()));
