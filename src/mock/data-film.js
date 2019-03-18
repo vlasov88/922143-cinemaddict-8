@@ -1,5 +1,4 @@
-import Card from './card';
-import {rand} from './utils';
+import {getRandomValue, getRandomValues, getRandomInteger} from "./randomizes";
 import moment from 'moment';
 
 /** Список заголовков */
@@ -59,29 +58,55 @@ const genres = [
   `Westerns`
 ];
 
-/**
- * Получить карточку с фильмом
- * @return {Card} карточка с фильмом
- */
-export const getCard = () => {
-  let description = ``;
-  const count = rand(1, 3);
-  for (let i = 0; i <= count; i++) {
-    description += `${description.length > 0 ? ` ` : ``}${descriptions[rand(0, descriptions.length - 1)]}`;
-  }
-  const momentDuration = moment.duration(rand(30, 180), `minutes`);
+const actors = [`Samuel L. Jackson`, `Catherine Keener`, `Sophia Bush`];
+const ages = [0, 13, 18];
+const countries = [`USA`, `France`, `Canada`];
+const directors = [`Brad Bird`];
+const writers = [`Brad Bird`];
+
+export const getRandomTitle = () =>
+  getRandomValue(titles);
+
+export const getRandomRating = () =>
+  `${getRandomInteger(2, 8)}.${getRandomInteger(0, 9)}`;
+
+export const getRandomYear = () =>
+  getRandomInteger(1920, 2019);
+
+export const getRandomDuration = () => {
+  const momentDuration = moment.duration(getRandomInteger(30, 180), `minutes`);
   const durationHours = momentDuration.hours();
   const durationMinutes = momentDuration.minutes();
-  const duration = `${durationHours > 0 ? `${durationHours}h` : ``}${durationHours > 0 && durationMinutes > 0 ? `&nbsp;` : ``}${durationMinutes > 0 ? `${durationMinutes}m` : ``}`;
-  return new Card(
-      titles[rand(0, titles.length - 1)],
-      `${rand(2, 8)}.${rand(0, 9)}`,
-      rand(1920, 2019),
-      duration,
-      genres[rand(0, genres.length - 1)],
-      `${posters[rand(0, posters.length - 1)]}`,
-      description,
-      rand(0, 100)
-  );
+  return `${durationHours > 0 ? `${durationHours}h` : ``}${durationHours > 0 && durationMinutes > 0 ? `&nbsp;` : ``}${durationMinutes > 0 ? `${durationMinutes}m` : ``}`;
 };
+
+export const getRandomGenre = () =>
+  getRandomValues(genres, getRandomInteger(1, 3));
+
+export const getRandomPoster = () =>
+  `./images/posters/${getRandomValue(posters)}`;
+
+export const getRandomDescription = () =>
+  getRandomValues(descriptions, getRandomInteger(1, 3)).join(` `);
+
+export const getRandomComments = () =>
+  getRandomInteger(0, 100);
+
+export const getRandomActors = () =>
+  getRandomValues(actors, getRandomInteger(1, 3));
+
+export const getRandomAge = () =>
+  getRandomValue(ages);
+
+export const getRandomCountry = () =>
+  getRandomValue(countries);
+
+export const getRandomDirector = () =>
+  getRandomValue(directors);
+
+export const getRandomTitleOriginal = () =>
+  getRandomValue(titles);
+
+export const getRandomWriter = () =>
+  getRandomValue(writers);
 

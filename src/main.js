@@ -1,7 +1,6 @@
-import makeFilmCard from './make-film-card';
-import makeFilter from './make-filter';
-import {getCard} from './mock';
-import {rand} from './utils';
+import FilmCard from './film-card';
+import Filter from './filter';
+
 
 /** Контейнер для фильтров */
 const filterContainer = document.querySelector(`.main-navigation`);
@@ -16,50 +15,6 @@ const cardsTopRatedContainer = document.querySelector(`.films-list--top-rated .f
 const cardsMostCommentedContainer = document.querySelector(`.films-list--most-commented .films-list__container`);
 
 /**
- * Добавить новый элемент фильтра
- * @param {string} link          ссылка
- * @param {string} caption       название
- * @param {number} amount        количество
- * @param {boolean} isAdditional true если элемент дополнительный
- */
-const addFilter = (link, caption, amount = null, isAdditional = false) => {
-  filterContainer.insertAdjacentHTML(`beforeend`, makeFilter(link, caption, amount, isAdditional));
-};
-
-/**
- * Добавить карточки с фильмами
- * @param {Card[]} cards карточки
- */
-const addFilmCards = (cards) => {
-  addCardsToContainer(cardsContainer, cards);
-};
-
-/**
- * Добавить карточки с фильмами в раздел "Топ рейтинга"
- * @param {Card[]} cards карточки
- */
-const addTopRatedCards = (cards) => {
-  addCardsToContainer(cardsTopRatedContainer, cards);
-};
-
-/**
- * Добавить карточки с фильмами в раздел "Наиболее комментируемые"
- * @param {Card[]} cards карточки
- */
-const addMostCommentedCards = (cards) => {
-  addCardsToContainer(cardsMostCommentedContainer, cards);
-};
-
-/**
- * Добавить карточки с фильмами в контейнер
- * @param {Element} container контейнер
- * @param {Card[]} cards      карточки
- */
-const addCardsToContainer = (container, cards) => {
-  container.insertAdjacentHTML(`beforeend`, cards.reduce((acc, curr) => acc + makeFilmCard(curr), ``));
-};
-
-/**
  * Обработчик смены фильтра
  * @param {Event} evt событие
  */
@@ -67,19 +22,18 @@ const filterHandler = (evt) => {
   if (!evt.target.classList.contains(`main-navigation__item`) && !evt.target.classList.contains(`main-navigation__item-count`)) {
     return;
   }
-  cardsContainer.innerHTML = ``;
-  const count = rand(1, 8);
-  addFilmCards([...Array(count)].map(() => getCard()));
 };
 
-addFilter(`#all`, `All movies`);
-addFilter(`#watchlist`, `Watchlist`, 13);
-addFilter(`#history`, `History`, 4);
-addFilter(`#favorites`, `Favorites`, 8);
-// addFilter(`#stats`, `Stats`, null, true);
+const generateFilters = () => [
+  {link: `#all`, caption: `All movies`},
+  {link: `#watchlist`, caption: `Watchlist`, amount: 13},
+  {link: `#history`, caption: `History`, amount: 4},
+  {link: `#favorites`, caption: `Favorites`, amount: 8},
+  {link: `#stats`, caption: `Stats`, isAdditional: true}
+]
+  .reduce((acc, {link, caption, amount, isAdditional}) =>
+    acc + new Filter(link, caption, amount, isAdditional).template, ``);
+
 
 filterContainer.addEventListener(`click`, filterHandler);
 
-addFilmCards([...Array(7)].map(() => getCard()));
-addTopRatedCards([...Array(2)].map(() => getCard()));
-addMostCommentedCards([...Array(2)].map(() => getCard()));
