@@ -1,4 +1,5 @@
 import {RatingSection} from "./film-details/rating-section";
+import {createElement} from "./create-element";
 
 export default class FilmDetails {
 
@@ -13,6 +14,8 @@ export default class FilmDetails {
       {term: `Country`, cell: this._film.country},
       {term: `Genres`, cell: this._film.genres.reduce((acc, cur) => acc + `<span class="film-details__genre">${cur}</span>`, ``)}
     ];
+    this._element = null;
+    this._onCloseButtonClick = this._onCloseButtonClick.bind(this);
   }
 
   get _template() {
@@ -103,6 +106,36 @@ export default class FilmDetails {
 
         </form>
       </section>`.trim();
+  }
+
+  set onClose(fn) {
+    this._onClose = fn;
+  }
+
+  render() {
+    this._element = createElement(this._template);
+    this._createListeners();
+    return this._element;
+  }
+
+  unrender() {
+    this._removeListeners();
+    this._element.remove();
+    this._element = null;
+  }
+
+  _createListeners() {
+    this._element.querySelector(`.film-details__close-btn`)
+    .addEventListener(`click`, this._onCloseButtonClick);
+  }
+
+  _removeListeners() {
+    this._element.querySelector(`.film-details__close-btn`)
+    .removeEventListener(`click`, this._onCloseButtonClick);
+  }
+
+  _onCloseButtonClick() {
+    typeof this._onClose === `function` && this._onClose();
   }
 
   _getDetailsTableTemplate(tableData) {

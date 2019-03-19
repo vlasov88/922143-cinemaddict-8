@@ -1,6 +1,9 @@
 import FilmCard from './film-card';
+import FilmDetails from './film-details';
+import {getFilm} from './mock/data';
 import Filter from './filter';
 
+const body = document.querySelector(`body`);
 
 /** Контейнер для фильтров */
 const filterContainer = document.querySelector(`.main-navigation`);
@@ -14,6 +17,28 @@ const cardsTopRatedContainer = document.querySelector(`.films-list--top-rated .f
 /** Контейнер для карточек раздела "Наиболее комментируемые" */
 const cardsMostCommentedContainer = document.querySelector(`.films-list--most-commented .films-list__container`);
 
+const renderElements = (container, element) => {
+  container.innerHTML = element;
+};
+
+let renderedCards = [];
+
+const renderFilmCards = (container, num = 8) => [...Array(num)]
+.forEach(() => {
+  const film = getFilm();
+  const filmCard = new FilmCard(film, container !== cardsContainer);
+  const filmDetails = new FilmDetails(film);
+  filmCard.onCommentClick = () => {
+    body.appendChild(filmDetails.render());
+  };
+
+  filmDetails.onClose = () => {
+    filmDetails.unrender();
+  };
+  container.appendChild(filmCard.render());
+  renderedCards.push(filmCard);
+});
+
 /**
  * Обработчик смены фильтра
  * @param {Event} evt событие
@@ -22,6 +47,9 @@ const filterHandler = (evt) => {
   if (!evt.target.classList.contains(`main-navigation__item`) && !evt.target.classList.contains(`main-navigation__item-count`)) {
     return;
   }
+  renderedCards.forEach((card) => card.unrender());
+  renderedCards = [];
+  renderFilmCards(cardsContainer);
 };
 
 const generateFilters = () => [
@@ -36,4 +64,9 @@ const generateFilters = () => [
 
 
 filterContainer.addEventListener(`click`, filterHandler);
+
+renderElements(filterContainer, generateFilters());
+renderFilmCards(cardsContainer);
+renderFilmCards(cardsMostCommentedContainer, 2);
+renderFilmCards(cardsTopRatedContainer, 2);
 

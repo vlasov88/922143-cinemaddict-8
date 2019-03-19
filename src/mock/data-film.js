@@ -80,7 +80,7 @@ export const getRandomDuration = () => {
   return `${durationHours > 0 ? `${durationHours}h` : ``}${durationHours > 0 && durationMinutes > 0 ? `&nbsp;` : ``}${durationMinutes > 0 ? `${durationMinutes}m` : ``}`;
 };
 
-export const getRandomGenre = () =>
+export const getRandomGenres = () =>
   getRandomValues(genres, getRandomInteger(1, 3));
 
 export const getRandomPoster = () =>
