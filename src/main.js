@@ -1,7 +1,9 @@
-import makeFilmCard from './make-film-card';
-import makeFilter from './make-filter';
-import {getCard} from './mock';
-import {rand} from './utils';
+import FilmCard from './film-card';
+import FilmDetails from './film-details';
+import {getFilm} from './mock/data';
+import Filter from './filter';
+
+const body = document.querySelector(`body`);
 
 /** Контейнер для фильтров */
 const filterContainer = document.querySelector(`.main-navigation`);
@@ -15,49 +17,27 @@ const cardsTopRatedContainer = document.querySelector(`.films-list--top-rated .f
 /** Контейнер для карточек раздела "Наиболее комментируемые" */
 const cardsMostCommentedContainer = document.querySelector(`.films-list--most-commented .films-list__container`);
 
-/**
- * Добавить новый элемент фильтра
- * @param {string} link          ссылка
- * @param {string} caption       название
- * @param {number} amount        количество
- * @param {boolean} isAdditional true если элемент дополнительный
- */
-const addFilter = (link, caption, amount = null, isAdditional = false) => {
-  filterContainer.insertAdjacentHTML(`beforeend`, makeFilter(link, caption, amount, isAdditional));
+const renderElements = (container, element) => {
+  container.innerHTML = element;
 };
 
-/**
- * Добавить карточки с фильмами
- * @param {Card[]} cards карточки
- */
-const addFilmCards = (cards) => {
-  addCardsToContainer(cardsContainer, cards);
-};
+let renderedCards = [];
 
-/**
- * Добавить карточки с фильмами в раздел "Топ рейтинга"
- * @param {Card[]} cards карточки
- */
-const addTopRatedCards = (cards) => {
-  addCardsToContainer(cardsTopRatedContainer, cards);
-};
+const renderFilmCards = (container, num = 8) => [...Array(num)]
+.forEach(() => {
+  const film = getFilm();
+  const filmCard = new FilmCard(film, container !== cardsContainer);
+  const filmDetails = new FilmDetails(film);
+  filmCard.onCommentClick = () => {
+    body.appendChild(filmDetails.render());
+  };
 
-/**
- * Добавить карточки с фильмами в раздел "Наиболее комментируемые"
- * @param {Card[]} cards карточки
- */
-const addMostCommentedCards = (cards) => {
-  addCardsToContainer(cardsMostCommentedContainer, cards);
-};
-
-/**
- * Добавить карточки с фильмами в контейнер
- * @param {Element} container контейнер
- * @param {Card[]} cards      карточки
- */
-const addCardsToContainer = (container, cards) => {
-  container.insertAdjacentHTML(`beforeend`, cards.reduce((acc, curr) => acc + makeFilmCard(curr), ``));
-};
+  filmDetails.onClose = () => {
+    filmDetails.unrender();
+  };
+  container.appendChild(filmCard.render());
+  renderedCards.push(filmCard);
+});
 
 /**
  * Обработчик смены фильтра
@@ -67,19 +47,26 @@ const filterHandler = (evt) => {
   if (!evt.target.classList.contains(`main-navigation__item`) && !evt.target.classList.contains(`main-navigation__item-count`)) {
     return;
   }
-  cardsContainer.innerHTML = ``;
-  const count = rand(1, 8);
-  addFilmCards([...Array(count)].map(() => getCard()));
+  renderedCards.forEach((card) => card.unrender());
+  renderedCards = [];
+  renderFilmCards(cardsContainer);
 };
 
-addFilter(`#all`, `All movies`);
-addFilter(`#watchlist`, `Watchlist`, 13);
-addFilter(`#history`, `History`, 4);
-addFilter(`#favorites`, `Favorites`, 8);
-// addFilter(`#stats`, `Stats`, null, true);
+const generateFilters = () => [
+  {link: `#all`, caption: `All movies`},
+  {link: `#watchlist`, caption: `Watchlist`, amount: 13},
+  {link: `#history`, caption: `History`, amount: 4},
+  {link: `#favorites`, caption: `Favorites`, amount: 8},
+  {link: `#stats`, caption: `Stats`, isAdditional: true}
+]
+  .reduce((acc, {link, caption, amount, isAdditional}) =>
+    acc + new Filter(link, caption, amount, isAdditional).template, ``);
+
 
 filterContainer.addEventListener(`click`, filterHandler);
 
-addFilmCards([...Array(7)].map(() => getCard()));
-addTopRatedCards([...Array(2)].map(() => getCard()));
-addMostCommentedCards([...Array(2)].map(() => getCard()));
+renderElements(filterContainer, generateFilters());
+renderFilmCards(cardsContainer);
+renderFilmCards(cardsMostCommentedContainer, 2);
+renderFilmCards(cardsTopRatedContainer, 2);
+
