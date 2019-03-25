@@ -28,11 +28,11 @@ const renderFilmCards = (container, num = 8) => [...Array(num)]
   const film = getFilm();
   const filmCard = new FilmCard(film, container !== cardsContainer);
   const filmDetails = new FilmDetails(film);
-  filmCard.onCommentClick = () => {
+  filmCard.onClick = () => {
     body.appendChild(filmDetails.render());
   };
 
-  filmDetails.onClose = () => {
+  filmDetails.onClick = () => {
     filmDetails.unrender();
   };
   container.appendChild(filmCard.render());

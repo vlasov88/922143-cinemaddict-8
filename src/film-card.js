@@ -1,16 +1,17 @@
-import {createElement} from './create-element';
+import Component from "./component";
+import {withCapability, makeHandler} from "./capability";
 
-export default class FilmCard {
-
+export default class FilmCard extends withCapability(
+    makeHandler({target: `Comment`, handle: `Click`})
+)(Component) {
   /**
    * @param {Film} film фильм
    * @param {boolean} isExtra true если карточка для дополнительного раздела
    */
   constructor(film, isExtra = false) {
+    super();
     this._film = {...film};
     this._isExtra = isExtra;
-    this._element = null;
-    this._onCommentButtonClick = this._onCommentButtonClick.bind(this);
   }
 
   /**
@@ -39,38 +40,14 @@ export default class FilmCard {
       </article>`.trim();
   }
 
-  set onCommentClick(fn) {
-    this._onCommentClick = fn;
-  }
-
-  get element() {
-    return this._element;
-  }
-
-  render() {
-    this._element = createElement(this._template);
-    this._createListeners();
-    return this._element;
-  }
-
-  unrender() {
-    this._removeListeners();
-    this._element.remove();
-    this._element = null;
-  }
-
   _createListeners() {
     this._element.querySelector(`.film-card__comments`)
-    .addEventListener(`click`, this._onCommentButtonClick);
+    .addEventListener(`click`, this._onCommentClick);
   }
 
   _removeListeners() {
     this._element.querySelector(`.film-card__comments`)
-    .removeEventListener(`click`, this._onCommentButtonClick);
-  }
-
-  _onCommentButtonClick() {
-    typeof this._onCommentClick === `function` && this._onCommentClick();
+    .removeEventListener(`click`, this._onCommentClick);
   }
 
 }

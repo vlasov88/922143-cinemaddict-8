@@ -84,7 +84,7 @@ export const getRandomGenres = () =>
   getRandomValues(genres, getRandomInteger(1, 3));
 
 export const getRandomPoster = () =>
-  `./images/posters/${getRandomValue(posters)}`;
+  `images/posters/${getRandomValue(posters)}`;
 
 export const getRandomDescription = () =>
   getRandomValues(descriptions, getRandomInteger(1, 3)).join(` `);
